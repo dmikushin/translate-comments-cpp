@@ -267,7 +267,7 @@ fn get_language_from_filepath(filepath: &str) -> Result<Languages> {
         "sh" => {
             return Ok(Languages::Bash);
         }
-        "cpp" | "cc" => {
+        "cpp" | "cc" | "c" => {
             return Ok(Languages::Cpp);
         }
         "css" => {
