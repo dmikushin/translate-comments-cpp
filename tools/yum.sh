@@ -8,6 +8,6 @@ TMPDIR="$(mktemp -d)"
 
 cd "$TMPDIR"
 git clone --depth 1 git@github.com:dustinblackman/yum.git .
-./add-rpms.sh languagetool-code-comments "$VERSION" "$DIST"
+./add-rpms.sh translate-comments-cpp "$VERSION" "$DIST"
 cd ~
 rm -rf "$TMPDIR"

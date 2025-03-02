@@ -10,7 +10,7 @@ use std::process::Command;
 
 fn main() {
     let output_help = String::from_utf8(
-        Command::new("./target/debug/languagetool-code-comments")
+        Command::new("./target/debug/translate-comments-cpp")
             .arg("--help")
             .env("NO_COLOR", "1")
             .output()
@@ -20,7 +20,7 @@ fn main() {
     .unwrap();
 
     let version_res = String::from_utf8(
-        Command::new("./target/debug/languagetool-code-comments")
+        Command::new("./target/debug/translate-comments-cpp")
             .arg("--version")
             .output()
             .unwrap()
@@ -41,7 +41,7 @@ fn main() {
     let end_choco = readme.find("<!-- choco-install end -->").unwrap();
     readme.replace_range(
         start_choco..end_choco,
-        &f!("<!-- choco-install start -->\n```sh\nchoco install languagetool-code-comments --version={version}```\n"),
+        &f!("<!-- choco-install start -->\n```sh\nchoco install translate-comments-cpp --version={version}```\n"),
     );
 
     let mut f = fs::File::create("./README.md").unwrap();

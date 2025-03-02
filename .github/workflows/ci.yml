@@ -4,7 +4,7 @@ name: ci
 
 jobs:
   build_and_test:
-    name: languagetool-code-comments
+    name: translate-comments-cpp
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

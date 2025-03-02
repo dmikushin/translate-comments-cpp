@@ -50,7 +50,7 @@ footer = """
 """
 # postprocessors
 postprocessors = [
-  { pattern = '<REPO>', replace = "https://github.com/dustinblackman/languagetool-code-comments" }, # replace repository URL
+  { pattern = '<REPO>', replace = "https://github.com/dustinblackman/translate-comments-cpp" }, # replace repository URL
 ]
 
 [git]

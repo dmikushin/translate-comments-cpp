@@ -11,6 +11,6 @@ TMPDIR="$(mktemp -d)"
 
 cd "$TMPDIR"
 git clone --depth 1 git@github.com:dustinblackman/chocolatey-packages.git .
-./add-package.sh languagetool-code-comments "$VERSION" "$DIST" "$(realpath "$PROGDIR"/../.goreleaser.yml)"
+./add-package.sh translate-comments-cpp "$VERSION" "$DIST" "$(realpath "$PROGDIR"/../.goreleaser.yml)"
 cd ~
 rm -rf "$TMPDIR"

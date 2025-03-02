@@ -21,12 +21,12 @@ goTargetToRust() {
 	fi
 }
 
-rm -rf "./dist/languagetool-code-comments_${target}"
-mkdir -p "./dist/languagetool-code-comments_${target}"
+rm -rf "./dist/translate-comments-cpp_${target}"
+mkdir -p "./dist/translate-comments-cpp_${target}"
 
-rustbin="./dist-gh/$(goTargetToRust)/languagetool-code-comments"
+rustbin="./dist-gh/$(goTargetToRust)/translate-comments-cpp"
 if [[ "$target" == "windows_amd64_v1" ]]; then
 	rustbin="${rustbin}.exe"
 fi
 
-cp "$rustbin" "./dist/languagetool-code-comments_${target}/"
+cp "$rustbin" "./dist/translate-comments-cpp_${target}/"

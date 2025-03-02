@@ -4,22 +4,23 @@ use std::path::PathBuf;
 use anyhow::Result;
 use async_std::fs;
 use fstrings::*;
-use languagetool_rust::check::Match;
 use serde::Deserialize;
 use serde::Serialize;
 use xxhash_rust::xxh3::xxh3_64;
 
+use crate::gpt::QueryResult;
+
 #[derive(Default, Debug, Clone, Deserialize, Serialize)]
 struct CacheFile {
     path: String,
-    matches: HashMap<u64, Vec<Match>>,
+    matches: HashMap<u64, QueryResult>,
 }
 
 /// Returns the cache directory for the current user.
 pub async fn get_dir_path() -> Result<PathBuf> {
     let cache_dir = dirs::config_dir()
         .unwrap()
-        .join("language-tool-code-comments/cache");
+        .join("translate-comments-cpp/cache");
 
     if !cache_dir.is_dir() {
         fs::create_dir_all(&cache_dir).await?;
@@ -44,10 +45,10 @@ pub async fn get_file_path(filepath: &str) -> Result<PathBuf> {
 
 /// Loads the cached match entries from cache, returning an empty hashmap if a
 /// cache entry did not exist.
-pub async fn get_cached_matches(filepath: &str) -> Result<HashMap<u64, Vec<Match>>> {
+pub async fn get_cached_matches(filepath: &str) -> Result<HashMap<u64, QueryResult>> {
     let filepath_cache = get_file_path(filepath).await?;
 
-    let mut cached_match_map: HashMap<u64, Vec<Match>> = HashMap::new();
+    let mut cached_match_map: HashMap<u64, QueryResult> = HashMap::new();
     if filepath_cache.is_file() {
         let cache = fs::read_to_string(filepath_cache.clone()).await?;
         let parsed: CacheFile = serde_json::from_str(&cache)?;
@@ -60,7 +61,7 @@ pub async fn get_cached_matches(filepath: &str) -> Result<HashMap<u64, Vec<Match
 /// Persists result matches to disk.
 pub async fn save_cached_matches(
     filepath: &str,
-    result_match_map: &HashMap<u64, Vec<Match>>,
+    result_match_map: &HashMap<u64, QueryResult>,
 ) -> Result<()> {
     let cache_file = CacheFile {
         path: filepath.to_string(),

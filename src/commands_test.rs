@@ -50,7 +50,6 @@ async fn test_commands_happy_path() -> Result<()> {
 
     let res = check(
         filepath,
-        "http://127.0.0.1:3344".to_string(),
         1,
         "en".to_string(),
     )

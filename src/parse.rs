@@ -19,8 +19,6 @@ use xxhash_rust::xxh3::xxh3_64;
 pub struct CodeComment {
     pub text: String,
     pub text_checksum: u64,
-    pub start_row: usize,
-    pub start_column: usize,
 }
 unsafe impl Send for CodeComment {}
 unsafe impl Sync for CodeComment {}
@@ -28,8 +26,6 @@ unsafe impl Sync for CodeComment {}
 #[derive(Clone, Debug)]
 struct CommentLeaf {
     pub text: String,
-    pub row: usize,
-    pub column: usize,
 }
 
 struct LanguageConfig {
@@ -349,11 +345,8 @@ fn parse_tree<'a>(
 
         if ["comment", "line_comment", "@comment"].contains(&node.kind()) {
             let node_text = &text[node.byte_range()];
-            let start_position = node.start_position();
             let comment_node = CommentLeaf {
                 text: node_text.to_string(),
-                row: start_position.row + start_row_position,
-                column: start_position.column + start_column_position,
             };
             vector.borrow_mut().push(comment_node);
         }
@@ -424,8 +417,8 @@ fn get_comment_nodes_from_source(
 }
 
 /// Converts source code to an array of CodeComment to later be processed by
-/// LanguageTool. This includes tree parsing, and hashing code comments text for
-/// deduping and caching.
+/// GPT translation. This includes tree parsing, and hashing code comments text
+/// for deduping and caching.
 pub async fn parse_code_comments(filepath: &str) -> Result<Vec<CodeComment>> {
     let lang = get_language_from_filepath(filepath)?;
     let source_code = fs::read_to_string(filepath).await?;
@@ -446,8 +439,6 @@ pub async fn parse_code_comments(filepath: &str) -> Result<Vec<CodeComment>> {
             return CodeComment {
                 text,
                 text_checksum,
-                start_row: comment_node.row,
-                start_column: comment_node.column,
             };
         })
         .collect::<Vec<CodeComment>>();

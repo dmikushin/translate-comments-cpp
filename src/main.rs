@@ -3,7 +3,7 @@
 
 mod cache;
 mod commands;
-mod lt;
+mod gpt;
 mod parse;
 
 use std::io;
@@ -32,29 +32,28 @@ lazy_static! {
 }
 
 fn build_cli() -> clap::Command<'static> {
-    return clap::Command::new("languagetool-code-comments")
-        .about("Integrates the LanguageTool API to parse, spell check, and correct the grammar of your code comments!")
+    return clap::Command::new("translate-comments-cpp")
+        .about("Get source code comments to speak your language!")
         .after_help(SUPPORTED_LANGS_HELP.as_str())
         .version(env!("VERGEN_GIT_SEMVER"))
         .setting(clap::AppSettings::SubcommandRequiredElseHelp)
         .subcommand(
-            clap::Command::new("check")
-                .about("Parses source code comments from the provided file and passes them to LanguageTool, returning grammar and spelling mistakes if any.")
+            clap::Command::new("translate")
+                .about("Parses source code comments from the provided file and passes them to GPT service, returning comments translations.")
                 .arg(
-                    clap::Arg::new("url")
-                        .long("url")
-                        .short('u')
-                        .help("LanguageTool API url.")
-                        .env("LTCC_URL")
-                        .default_value("https://api.languagetool.org")
+                    clap::Arg::new("input")
+                        .long("input")
+                        .short('i')
+                        .help("Path to input source code file.")
+                        .value_hint(clap::ValueHint::FilePath)
                         .takes_value(true)
                         .multiple_values(false),
                 )
                 .arg(
-                    clap::Arg::new("file")
-                        .long("file")
-                        .short('f')
-                        .help("Path to source code file.")
+                    clap::Arg::new("output")
+                        .long("output")
+                        .short('o')
+                        .help("Path to output source code file.")
                         .value_hint(clap::ValueHint::FilePath)
                         .takes_value(true)
                         .multiple_values(false),
@@ -64,7 +63,7 @@ fn build_cli() -> clap::Command<'static> {
                         .long("concurrency")
                         .short('c')
                         .default_value("10")
-                        .help("Maximum amount of requests to make to LanguageTools in parallel.")
+                        .help("Maximum amount of requests to make to GPT service in parallel.")
                         .takes_value(true)
                         .multiple_values(false),
                 )
@@ -72,28 +71,16 @@ fn build_cli() -> clap::Command<'static> {
                     clap::Arg::new("language")
                         .long("language")
                         .short('l')
-                        .default_value("auto")
-                        .help("Written language of code comment blocks. Setting this to a language code (en-US, fr-FR, es-MX) will speed up requests to LanguageTool.")
+                        .default_value("en-US")
+                        .help("New language of source code comment blocks, in form of language code, such as en-US, fr-FR or es-MX.")
                         .takes_value(true)
                         .multiple_values(false),
                 ),
 
         )
         .subcommand(
-            clap::Command::new("completion")
-                .about("Generates shell completions")
-                .arg(
-                    clap::Arg::new("shell")
-                        .short('s')
-                        .long("shell")
-                        .help("Which shell to generate completions for.")
-                        .possible_values(clap_complete::Shell::possible_values())
-                        .required(true),
-                ),
-        )
-        .subcommand(
             clap::Command::new("cache")
-                .about("Functionality around the LanguageTools result cache.")
+                .about("Translation results caching options.")
                 .setting(clap::AppSettings::SubcommandRequiredElseHelp)
                 .subcommand(
                     clap::Command::new("path").about("Outputs the cache directories path")
@@ -111,9 +98,9 @@ fn print_completions<G: clap_complete::Generator>(gen: G, app: &mut clap::Comman
 async fn parse_cli() -> Result<()> {
     let matches = build_cli().get_matches();
     match matches.subcommand() {
-        Some(("check", run_matches)) => {
-            let filepath = run_matches.get_one::<String>("file").unwrap().to_string();
-            let languagetool_api_url = run_matches.get_one::<String>("url").unwrap().to_string();
+        Some(("translate", run_matches)) => {
+            let input = run_matches.get_one::<String>("input").unwrap().to_string();
+            let output = run_matches.get_one::<String>("output").map(|s| s.to_string());
             let language = run_matches
                 .get_one::<String>("language")
                 .unwrap()
@@ -124,8 +111,24 @@ async fn parse_cli() -> Result<()> {
                 .parse::<usize>()?;
 
             let res =
-                commands::check(filepath, languagetool_api_url, concurrency, language).await?;
-            println!("{}", serde_json::to_string(&res)?);
+                commands::translate(input.clone(), concurrency, language).await?;
+
+            if let Some(output_path) = output {
+                // Read the input file
+                let input_content = std::fs::read_to_string(&input)?;
+
+                // Replace occurrences of QueryResult.text with QueryResult.text_translation
+                let mut modified_content = input_content.clone();
+                for query_result in &res {
+                    modified_content = modified_content.replace(&query_result.text, &query_result.text_translation);
+                }
+
+                // Write the modified content to the output file
+                std::fs::write(output_path, modified_content)?;
+            } else {
+                // Print JSON results if no output file is specified
+                println!("{}", serde_json::to_string(&res)?);
+            }
         }
         Some(("completion", run_matches)) => {
             if let Ok(generator) = run_matches.value_of_t::<clap_complete::Shell>("shell") {

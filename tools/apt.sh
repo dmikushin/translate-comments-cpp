@@ -8,6 +8,6 @@ TMPDIR="$(mktemp -d)"
 
 cd "$TMPDIR"
 git clone --depth 1 git@github.com:dustinblackman/apt.git .
-./add-debs.sh languagetool-code-comments "$VERSION" "$DIST"
+./add-debs.sh translate-comments-cpp "$VERSION" "$DIST"
 cd ~
 rm -rf "$TMPDIR"
