@@ -5,33 +5,33 @@ edition = "2021"
 license = "MIT"
 
 [dependencies]
-anyhow = "=1.0.63"
-async-std = { version = "=1.12.0", features = ["tokio1"] }
+anyhow = "=1.0.97"
+async-std = { version = "=1.13.0", features = ["tokio1"] }
 clap = "=3.2.17"
 clap_complete = "=3.2.3"
-dirs = "=4.0.0"
+dirs = "=6.0.0"
 fstrings = "=0.2.3"
-futures = { version = "=0.3.23", features = ["std"] }
-languagetool-rust = { version = "=1.2.0", default-features = false, features = ["cli"] }
-lazy_static = "=1.4.0"
-owo-colors = "3.5.0"
-serde = { version = "=1.0.143", features = ["derive"] }
-serde_json = "=1.0.83"
-tokio = { version = "=1.20.1", features = ["macros"] }
-tree-sitter = "=0.20.8"
-url = "=2.2.2"
-xxhash-rust = { version = "=0.8.5", features = ["xxh3"] }
+futures = { version = "=0.3.31", features = ["std"] }
+languagetool-rust = { version = "=2.1.4", default-features = false, features = ["cli"] }
+lazy_static = "=1.5.0"
+owo-colors = "4.2.0"
+serde = { version = "=1.0.218", features = ["derive"] }
+serde_json = "=1.0.139"
+tokio = { version = "=1.43.0", features = ["macros"] }
+tree-sitter = "=0.25.2"
+url = "=2.5.4"
+xxhash-rust = { version = "=0.8.15", features = ["xxh3"] }
 
 # Enable vendored features to simplify cross compilation.
-reqwest = { version = "=0.11.11", default-features = false, features = ["native-tls-vendored", "json"] }
+reqwest = { version = "=0.12.12", default-features = false, features = ["native-tls-vendored", "json"] }
 
 [dev-dependencies]
-axum = "=0.5.15"
+axum = "=0.8.1"
 expectest = "=0.12.0"
 
 [build-dependencies]
-cc = { version = "=1.0.73", features = ["parallel"] }
-vergen = { version = "=7.4.0", features = ["git"] }
+cc = { version = "=1.2.16", features = ["parallel"] }
+vergen = { version = "=7.5.0", features = ["git"] }
 
 [package.metadata.bin]
 cargo-about = { version = "0.5.7" }

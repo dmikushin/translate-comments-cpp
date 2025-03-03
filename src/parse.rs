@@ -399,7 +399,7 @@ fn get_comment_nodes_from_source(
 ) -> Result<Vec<CommentLeaf>> {
     let lang_config = get_language_config(lang);
     let mut parser = Parser::new();
-    parser.set_language(lang_config.language)?;
+    parser.set_language(&lang_config.language)?;
 
     let tree = parser.parse(source_code, None).unwrap();
     let leaves = RefCell::new(Vec::new());
