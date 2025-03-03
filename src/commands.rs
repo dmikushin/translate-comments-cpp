@@ -45,7 +45,7 @@ pub async fn translate(
     }
 
     let mut result_match_map: HashMap<u64, QueryResult> = HashMap::new();
-    let query_requests = comments_checksum_map
+    let query_requests = comments_checksum_map.clone()
         .into_iter()
         .filter(|(text_checksum, _text)| {
             if cached_match_map.contains_key(text_checksum) {
@@ -68,8 +68,19 @@ pub async fn translate(
     let gpt_translator_client = gpt::Translator::new()?;
     let query_results = gpt_translator_client.query_many(query_requests, concurrency).await?;
     for query_result in query_results.iter() {
-        // TODO remove clone.
-        result_match_map.insert(query_result.text_checksum, query_result.to_owned());
+        let original_comment = query_result.text.clone();
+        let mut text_translation = query_result.text_translation.clone();
+
+        // Check if the original comment starts with "//" and ensure the translated comment does too
+        if original_comment.trim_start().starts_with("//") && !text_translation.trim_start().starts_with("//") {
+            text_translation = format!("// {}", text_translation);
+        }
+
+        // Insert the possibly modified translated text into the result map
+        result_match_map.insert(query_result.text_checksum, QueryResult {
+            text_translation: text_translation,
+            ..query_result.clone()
+        });
     }
 
     cache::save_cached_matches(&filepath, &result_match_map).await?;
