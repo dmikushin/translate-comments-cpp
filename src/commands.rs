@@ -3,13 +3,20 @@
 mod tests;
 
 use std::collections::HashMap;
-
 use anyhow::Result;
-
 use crate::cache;
 use crate::gpt;
 use crate::gpt::QueryResult;
 use crate::parse;
+use whatlang::detect;
+use rayon::prelude::*;
+
+fn detect_language(comment: &str) -> String {
+    if let Some(info) = detect(comment) {
+        return info.lang().code().to_string();
+    }
+    "unknown".to_string()
+}
 
 pub async fn translate(
     filepath: String,
@@ -19,11 +26,21 @@ pub async fn translate(
     let cached_match_map = cache::get_cached_matches(&filepath).await?;
     let code_comments = parse::parse_code_comments(&filepath).await?;
 
+    fn is_in_target_language(comment: &str, language: &str) -> bool {
+        detect_language(comment) == language
+    }
+
+    // Filter out comments already in the target language
+    let filtered_comments: Vec<_> = code_comments
+        .par_iter()
+        .filter(|comment| !is_in_target_language(&comment.text, &language))
+        .collect();
+
     // Creates a hashmap with checksums of all the code comments. This is later used
     // to dedupe requests to GPT for codebases that have reoccuring
     // comments in the same file.
     let mut comments_checksum_map: HashMap<u64, String> = HashMap::new();
-    for code_comment in code_comments.iter() {
+    for code_comment in filtered_comments.iter() {
         comments_checksum_map.insert(code_comment.text_checksum, code_comment.text.to_owned());
     }
 

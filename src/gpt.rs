@@ -48,7 +48,7 @@ impl Translator {
 
     async fn run(&self, language: &str, text: &str) -> Result<String, Box<dyn Error>> {
         let system_prompt = format!(
-            "You are a Language Translator. Detect the source language and translate it to \"{}\". Always just return the translation of the prompt.",
+            "You are a Language Translator. Detect the source language and translate it to \"{}\". Always just return the translation of the prompt. If there is nothing to translate, just return the original prompt.",
             language
         );
 

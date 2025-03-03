@@ -18,6 +18,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "512761e0bb2578dd7380c6baaa0f4ce03e84f95e960231d1dec8bf4d7d6e2627"
 
 [[package]]
+name = "ahash"
+version = "0.3.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e8fd72866655d1904d6b0997d0b07ba561047d070fbe29de039031c641b61217"
+
+[[package]]
 name = "aho-corasick"
 version = "1.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -470,6 +476,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "773648b94d0e5d620f64f280777445740e61fe701025087ec8b57f45c791888b"
 
 [[package]]
+name = "crossbeam-deque"
+version = "0.8.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9dd111b7b7f7d55b72c0a6ae361660ee5853c9af73f70c3c2ef6858b950e2e51"
+dependencies = [
+ "crossbeam-epoch",
+ "crossbeam-utils",
+]
+
+[[package]]
+name = "crossbeam-epoch"
+version = "0.9.18"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5b82ac4a3c2ca9c3460964f020e1402edd5753411d7737aa39c3714ad1b5420e"
+dependencies = [
+ "crossbeam-utils",
+]
+
+[[package]]
 name = "crossbeam-utils"
 version = "0.8.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -515,6 +540,12 @@ dependencies = [
  "quote",
  "syn 2.0.98",
 ]
+
+[[package]]
+name = "either"
+version = "1.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b7914353092ddf589ad78f25c5c1c21b7f80b0ff8621e7c814c3485b5306da9d"
 
 [[package]]
 name = "encoding_rs"
@@ -840,6 +871,16 @@ dependencies = [
  "tokio",
  "tokio-util",
  "tracing",
+]
+
+[[package]]
+name = "hashbrown"
+version = "0.7.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "96282e96bfcd3da0d3aa9938bedf1e50df3269b6db08b4876d2da0bb1a0841cf"
+dependencies = [
+ "ahash",
+ "autocfg",
 ]
 
 [[package]]
@@ -1597,6 +1638,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "rayon"
+version = "1.5.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bd99e5772ead8baa5215278c9b15bf92087709e9c1b2d1f97cdb5a183c933a7d"
+dependencies = [
+ "autocfg",
+ "crossbeam-deque",
+ "either",
+ "rayon-core",
+]
+
+[[package]]
+name = "rayon-core"
+version = "1.12.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1465873a3dfdaa8ae7cb14b4383657caab0b3e8a0aa9ae8e04b044854c8dfce2"
+dependencies = [
+ "crossbeam-deque",
+ "crossbeam-utils",
+]
+
+[[package]]
 name = "redox_users"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2233,6 +2296,7 @@ dependencies = [
  "languagetool-rust",
  "lazy_static",
  "owo-colors",
+ "rayon",
  "reqwest 0.12.12",
  "serde",
  "serde_json",
@@ -2240,6 +2304,7 @@ dependencies = [
  "tree-sitter",
  "url",
  "vergen",
+ "whatlang",
  "xxhash-rust",
 ]
 
@@ -2443,6 +2508,15 @@ checksum = "33b6dd2ef9186f1f2072e409e99cd22a975331a6b3591b12c764e0e55c60d5d2"
 dependencies = [
  "js-sys",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "whatlang"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7a346d2eb29c03618693ed24a29d1acd0c3f2cb08ae58b9669d7461e033cf703"
+dependencies = [
+ "hashbrown 0.7.2",
 ]
 
 [[package]]
